@@ -1,8 +1,5 @@
 const helpers = require('./helpers/helpers')
 const https = require('https');
-const { type } = require('os');
-const { formatRequestOptions } = require('./helpers/helpers');
-const { start } = require('repl');
 
 /**
  * Get request to facebook API
