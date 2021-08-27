@@ -44,11 +44,47 @@ function hasVersionPrefix(urlPath){
     return regex.test(urlPath)
 }
 
-function isString(value) {
-    return typeof value === 'string' || value instanceof String;
+/**
+ * Function to verify if value is string. 
+ * @param {any} val 
+ * @returns {boolean} True if string, false otherwise.
+ * Note: String objects will not be counted as string
+ */
+function isString(val){
+    return typeof val ==='string';
+}
+
+/**
+ * This function computes the ISO date for 15 days ago from current date
+ * @returns {string} Date from 15 days ago with ISO layout 'YYYY-MM-DD'
+ */
+ function getStartDate(){
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate() - 15);
+    return startDate.toISOString();
+}
+
+/**
+ * Returns the value for 'after' cursos if object has cursor based pagination
+ * @param {object} object 
+ * @returns {string} Value for 'after' cursor 
+ */
+function getAfterCursor(object){
+    if(typeof object === 'object'){
+        if ('data' in object && 'paging' in object){
+            if ('cursors' in object.paging){
+                if ('after' in object.paging.cursors){
+                    return object.paging.cursors.after;
+                }
+            }
+        }
+    }
 }
 
 module.exports = {
     buildURL: buildURL,
-    formatRequestOptions: formatRequestOptions
+    formatRequestOptions: formatRequestOptions,
+    isString: isString,
+    getStartDate: getStartDate,
+    getAfterCursor: getAfterCursor
 }
