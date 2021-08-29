@@ -82,7 +82,7 @@ function getAfterCursor(object){
 }
 
 /**
- * Returns the value for 'after' cursos if object has cursor based pagination
+ * Returns the value for 'after' cursor if object has cursor based pagination
  * @param {object} object 
  * @returns Value for 'after' cursor if any, otherwise undefined
  */
@@ -99,7 +99,7 @@ function getAfterCursor(object){
 }
 
 /**
- * 
+ * Returns the value for 'next' cursor if object has pagination
  * @param {object} object 
  * @returns Value for 'next' cursor if any, otherwise undefined
  */
