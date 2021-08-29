@@ -67,7 +67,7 @@ function isString(val){
 /**
  * Returns the value for 'after' cursos if object has cursor based pagination
  * @param {object} object 
- * @returns {string} Value for 'after' cursor 
+ * @returns Value for 'after' cursor if any, otherwise undefined
  */
 function getAfterCursor(object){
     if(typeof object === 'object'){
@@ -81,10 +81,25 @@ function getAfterCursor(object){
     }
 }
 
+/**
+ * 
+ * @param {object} object 
+ * @returns Value for 'next' cursor if any, otherwise undefined
+ */
+function getNextCursor(object){
+    if (typeof object === 'object'){
+        if('data' in object && 'paging' in object){
+            if('next' in object.paging){
+                return object.paging.next;
+            }
+        }
+    }
+}
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
     isString: isString,
     getStartDate: getStartDate,
-    getAfterCursor: getAfterCursor
+    getAfterCursor: getAfterCursor,
+    getNextCursor: getNextCursor
 }

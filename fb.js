@@ -1,6 +1,7 @@
 const helpers = require('./helpers/helpers')
 const discovery = require('./discovery')
 const https = require('https');
+
 /**
  * Get request to facebook API
  * @param {string} urlPath 
@@ -12,31 +13,14 @@ const https = require('https');
  */
 const Get = function (urlPath, params){
     return new Promise(function(resolve,reject){
-        const options = helpers.formatRequestOptions(helpers.buildURL(urlPath,params));
-        const req = https.request(options,(res)=>{
-            let data = [];
-            res.on('data', (chunk)=> {
-                data.push(chunk);
-            });
-            res.on('error',(err)=>{
-                reject(err)
-            })
-            res.on('end', ()=> {
-                try {
-                    data = JSON.parse(Buffer.concat(data).toString());
-                } catch(e) {
-                    reject(e);
-                }
-                if (res.statusCode < 200 || res.statusCode >=400){
-                    reject(data);
-                }
-                resolve(data);
-            });
-        });
-        req.on('error', function(err) {
-            reject(err);
-        });
-        req.end();
+        try{
+            const options = helpers.formatRequestOptions(helpers.buildURL(urlPath,params));
+            let results = [];
+            resolve(getRequest(options,results))
+        }catch(e){
+            reject(e);
+        }
+        
     });
 }
 
@@ -78,7 +62,84 @@ function DiscoverPosts(urlPath, fields, token,posts){
     })
 }
 
+/**
+ * 
+ * Get request to facebook API reading paginated results.
+ * Results will be read until no more 'next' cursor is returned in response
+ * @param {string} urlPath 
+ * url path for request. Must start with api version ex: /v11.0/..
+ * @param {string} params 
+ * query parameters as key value pais
+ * @returns {Promise} Promise object represents request payload
+ */
+function GetAll(urlPath,params){
+    let results = [];
+    return Get(urlPath,params).then((data)=>{
+        if(data){
+            if ('data' in data){
+                results = [...results,...data.data];
+                const next = helpers.getNextCursor(data);
+                if (next){
+                    return getAll(next,results);
+                }
+                return results;
+            }
+            return data;
+        }
+        return [];
+    }).catch((err)=>{
+        throw(err);
+    })
+}
+
+function getAll(url,results){
+    return getRequest(url).then((data)=>{
+        if(data){
+            if ('data' in data){
+                results = [...results,...data.data];
+                const next = helpers.getNextCursor(data); 
+                if (next){
+                    return getAll(next,results);
+                }
+            }
+        }
+        return results;
+    }).catch((err)=>{
+        throw (err);
+    })
+}
+
+function getRequest(urlParams){
+    return new Promise(function(resolve,reject){
+        const req = https.request(urlParams,(res) =>{
+            let data = [];
+            res.on('data',(chunk)=>{
+                data.push(chunk);
+            });
+            res.on('error',(err)=>{
+                reject(err);
+            });
+            res.on('end',()=>{
+                try{
+                    data = JSON.parse(Buffer.concat(data).toString());
+                }catch(e){
+                    reject(e);
+                }
+                if (res.statusCode < 200 || res.statusCode >=400){
+                    reject(data);
+                }
+                resolve(data);
+            });
+        });
+        req.on('error',function(err){
+            reject(err);
+        });
+        req.end();
+    });
+}
+
 module.exports = {
     Get: Get,
-    Discovery: DiscoverPosts
+    Discovery: DiscoverPosts,
+    GetAll: GetAll
 }

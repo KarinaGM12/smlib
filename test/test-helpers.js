@@ -66,3 +66,28 @@ describe('getAfterCursor',()=>{
         assert.equal(excercise,'nextPage')
     })
 })
+
+describe('getNextCursor',()=>{
+    it('returns undefined when no cursor is present',()=>{
+        const exercise = helpers.getNextCursor()
+        assert.equal(exercise,undefined)
+    })
+    it('returns undefined when a string is passed',()=>{
+        const excercise = helpers.getNextCursor('test')
+        assert.equal(excercise,undefined)
+    })
+    it('returns undefined when an array is passed',()=>{
+        const excercise = helpers.getNextCursor([])
+        assert.equal(excercise,undefined)
+    })
+    it('returns cursor when data object with paging and next cursor is passed',()=>{
+        const object = {
+            data: [],
+            paging:{
+                next:'nextPage'
+            }
+        } 
+        const excercise = helpers.getNextCursor(object)
+        assert.equal(excercise,'nextPage')
+    })
+})
