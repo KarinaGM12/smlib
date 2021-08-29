@@ -65,26 +65,9 @@ function isString(val){
 }
 
 /**
- * Returns the value for 'after' cursos if object has cursor based pagination
- * @param {object} object 
- * @returns {string} Value for 'after' cursor 
- */
-function getAfterCursor(object){
-    if(typeof object === 'object'){
-        if ('data' in object && 'paging' in object){
-            if ('cursors' in object.paging){
-                if ('after' in object.paging.cursors){
-                    return object.paging.cursors.after;
-                }
-            }
-        }
-    }
-}
-
-/**
  * Returns the value for 'after' cursor if object has cursor based pagination
  * @param {object} object 
- * @returns Value for 'after' cursor if any, otherwise undefined
+ * @returns {string} Value for 'after' cursor 
  */
 function getAfterCursor(object){
     if(typeof object === 'object'){
