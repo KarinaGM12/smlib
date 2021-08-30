@@ -1,6 +1,7 @@
 const helpers = require('./helpers/helpers')
 const discovery = require('./discovery')
 const https = require('https');
+const fields = require('./fields')
 /**
  * Get request to facebook API
  * @param {string} urlPath 
@@ -137,8 +138,57 @@ function getRequest(urlParams){
     });
 }
 
+/**
+ * GetPostContent gets caption,media_type,media_url,childrens media_url,comment_count,like_count, and impressions 
+ * from an Instagram post.  (ex '/v11.0/12437548796'
+ * woule request post content for post with Id 12437548796)
+ * @param {string} urlPath url path for request. Must start with api version ex: '/v11.0/123412341234'
+ * where 12341234 represents the post you want to query
+ * @param {string} token Facebook graph API token
+ * @returns {Promise} Promise object represents request payload
+ */
+function GetPostContent(urlPath,token){
+    const fieldsSet = getPostFields();
+    return new Promise(function(resolve, reject){
+        try{
+            const params = {
+                'fields':fieldsSet.getAsString(),
+                'access_token':token
+            }
+            resolve(
+                Get(urlPath,params).then((response)=>{
+                    if(response){
+                        helpers.formatPost(response)
+                        return response;
+                    }
+                    return {};
+                }).catch((err)=>{
+                    throw(err);
+                })
+            )
+        }catch(e){
+            reject(e);
+        }
+    })
+}
+
+function getPostFields(){
+    const f = new fields.Fields();
+    f.setItem('timestamp');
+    f.setItem('caption');
+    f.setItem('media_type');
+    f.setItem('media_url');
+    f.setItem('children{media_url}');
+    f.setItem('comments_count');
+    f.setItem('like_count');
+    f.setItem('insights.metric(impressions)');
+    return f;
+}
+
+
 module.exports = {
     Get: Get,
-    Discovery: DiscoverPosts,
-    GetAll: GetAll
+    Discover: DiscoverPosts,
+    GetAll: GetAll,
+    GetPost: GetPostContent,
 }
