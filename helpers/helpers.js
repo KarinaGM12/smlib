@@ -95,11 +95,53 @@ function getNextCursor(object){
         }
     }
 }
+
+/**
+ * Verifies wether or not input is a valid version value for Facebook Graph API
+ * @param {string} version
+ * @returns {boolean} true if it is a valid version (ex. 'v11.0') and false otherwise
+ */
+function isVersion(version){
+    if(isString(version)){
+        const regex = new RegExp("^(v[0-9]+\.[0-9])$");
+        return regex.test(version);
+    }
+    return false;
+}
+
+/**
+ * Formats response from post request so
+ * impressions is a property of response object
+ * @param {object} response Response from post request
+ */
+function formatPostResponse(response){
+    let impressions = 0;
+    if (typeof response === 'object'){
+        if ('insights' in response){
+            if ('data' in response.insights){
+                const data = response.insights.data;
+                if (data.length > 0){
+                    if(typeof data[0] === 'object'){
+                        if ('values' in data[0]){
+                            if (data[0].values.length > 0){
+                                impressions = data[0].values[0].value;
+                            }
+                        }
+                    }
+                } 
+           }
+        }
+        response.impressions = impressions;
+    }
+}
+
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
     isString: isString,
     getStartDate: getStartDate,
     getAfterCursor: getAfterCursor,
-    getNextCursor: getNextCursor
+    getNextCursor: getNextCursor,
+    isVersion: isVersion,
+    formatPost: formatPostResponse
 }

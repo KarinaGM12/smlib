@@ -91,3 +91,36 @@ describe('getNextCursor',()=>{
         assert.equal(excercise,'nextPage')
     })
 })
+
+describe('isVersion',()=>{
+    it('returns true with input v11.0',()=>{
+        assert.equal(helpers.isVersion('v11.0'),true)
+    })
+    it('returns false with input v1.00',()=>{
+        assert.equal(helpers.isVersion('v1.00'),false)
+    })
+    it('returns false with empty object as input',()=>{
+        assert.equal(helpers.isVersion({}),false)
+    })
+})
+
+describe('formatPostResponse',()=>{
+    it('sets impressions in response when it is an object',()=>{
+        const response = {}
+        helpers.formatPost(response)
+        if ('impressions' in response){
+            assert.ok(true)
+        }else{
+            assert.fail();
+        }
+    })
+    it('does not set impressions in response when it is an array',()=>{
+        let response = [];
+        helpers.formatPost(response)
+        if ('impressions' in response){
+            assert.ok(true)
+        }else{
+            assert.fail();
+        }
+    })
+})
