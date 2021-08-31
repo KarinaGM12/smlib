@@ -135,6 +135,23 @@ function formatPostResponse(response){
     }
 }
 
+function getDates(numberOfDays){
+    const daysAgo = (Number.isInteger(numberOfDays)?numberOfDays:30);
+    const daysAfterStart = (daysAgo > 30? 30:daysAgo);
+
+    let start = new Date();
+    start.setDate(start.getDate()-daysAgo);
+    const startDate = start.toISOString();
+    start.setDate(start.getDate()+daysAfterStart);
+    const endDate = start.toISOString();
+    
+    return {
+        startDate: startDate.substring(0,10),
+        endDate: endDate.substring(0,10),
+    }
+
+}
+
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
@@ -143,5 +160,7 @@ module.exports = {
     getAfterCursor: getAfterCursor,
     getNextCursor: getNextCursor,
     isVersion: isVersion,
-    formatPost: formatPostResponse
+    formatPost: formatPostResponse,
+    getDates:getDates,
+
 }

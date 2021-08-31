@@ -1,7 +1,7 @@
 const helpers = require('./helpers/helpers')
 const discovery = require('./discovery')
 const https = require('https');
-const fields = require('./fields')
+const fields = require('./fields');
 /**
  * Get request to facebook API
  * @param {string} urlPath 
@@ -185,10 +185,71 @@ function getPostFields(){
     return f;
 }
 
+function GetDailyInsights(urlPath,token,daysAgo){
+    return new Promise(function(resolve,reject){
+        try{
+            const dates = helpers.getDates(daysAgo)
+            const params = {
+                'metric':'impressions,reach',
+                'period':'day',
+                'since': dates.startDate,
+                'until': dates.endDate,
+                'access_token':token
+            }
+            resolve(
+                GetAll(urlPath,params).then((results)=>{
+                    const metrics = {
+                        impressions: 0,
+                        reach: 0,
+                        followerCount: 0
+                    }
+                    if (results && Array.isArray(results)){
+                        results.forEach((metric)=>{
+                            if (typeof metric === 'object'){
+                                const value = getMetricValue(metric)
+                                switch (metric.name){
+                                    case 'impressions':
+                                        metrics.impressions += value;
+                                        break;
+                                    case 'reach':
+                                        metrics.reach += value;
+                                        break;
+                                    case 'follower_count':
+                                        metrics.followerCount += value;
+                                        break;
+                                }
+                            }
+                        })
+                    }
+                    return metrics;
+                }).catch((err)=>{
+                    throw (err)
+                })
+            )
+        }catch(e){
+            reject(e)
+        }
+    })
+}
+
+function getMetricValue(metric){
+    let value = 0;
+    if (typeof metric === 'object'){
+        if ('values' in metric && Array.isArray(metric.values)){
+            metric.values.forEach((val)=>{
+                value += val.value;
+            })
+        }
+    }
+    return value
+}
+
+
 
 module.exports = {
     Get: Get,
     Discover: DiscoverPosts,
     GetAll: GetAll,
     GetPost: GetPostContent,
+    GetInsights: GetDailyInsights,
 }
