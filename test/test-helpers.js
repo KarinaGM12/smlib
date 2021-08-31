@@ -66,3 +66,61 @@ describe('getAfterCursor',()=>{
         assert.equal(excercise,'nextPage')
     })
 })
+
+describe('getNextCursor',()=>{
+    it('returns undefined when no cursor is present',()=>{
+        const exercise = helpers.getNextCursor()
+        assert.equal(exercise,undefined)
+    })
+    it('returns undefined when a string is passed',()=>{
+        const excercise = helpers.getNextCursor('test')
+        assert.equal(excercise,undefined)
+    })
+    it('returns undefined when an array is passed',()=>{
+        const excercise = helpers.getNextCursor([])
+        assert.equal(excercise,undefined)
+    })
+    it('returns cursor when data object with paging and next cursor is passed',()=>{
+        const object = {
+            data: [],
+            paging:{
+                next:'nextPage'
+            }
+        } 
+        const excercise = helpers.getNextCursor(object)
+        assert.equal(excercise,'nextPage')
+    })
+})
+
+describe('isVersion',()=>{
+    it('returns true with input v11.0',()=>{
+        assert.equal(helpers.isVersion('v11.0'),true)
+    })
+    it('returns false with input v1.00',()=>{
+        assert.equal(helpers.isVersion('v1.00'),false)
+    })
+    it('returns false with empty object as input',()=>{
+        assert.equal(helpers.isVersion({}),false)
+    })
+})
+
+describe('formatPostResponse',()=>{
+    it('sets impressions in response when it is an object',()=>{
+        const response = {}
+        helpers.formatPost(response)
+        if ('impressions' in response){
+            assert.ok(true)
+        }else{
+            assert.fail();
+        }
+    })
+    it('does not set impressions in response when it is an array',()=>{
+        let response = [];
+        helpers.formatPost(response)
+        if ('impressions' in response){
+            assert.ok(true)
+        }else{
+            assert.fail();
+        }
+    })
+})

@@ -73,7 +73,7 @@ class DiscoveryFields {
             stringFields +=(this.endDate === ''?'':`.until(${this.endDate})`);
         }
         stringFields += (this.after === ''?'':`.after(${this.after})`);
-        stringFields += '{timestamp,caption,media_type,children{media_url}}}';
+        stringFields += '{timestamp,caption,media_type,media_url,children{media_url}}}';
         return stringFields
     }
 }
