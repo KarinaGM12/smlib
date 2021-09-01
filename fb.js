@@ -185,6 +185,14 @@ function getPostFields(){
     return f;
 }
 
+/**
+ * Returns metrics reach,impressions,and follower count metrics
+ * aggregated over a time range from n days ago up to current date
+ * @param {string} urlPath path for user instagram insights. Ex: '/v11.0/{igUserID}/insights'
+ * @param {string} token access token for Facebook API
+ * @param {Number} daysAgo Number of days ago to retrieve metrics
+ * @returns 
+ */
 function GetDailyInsights(urlPath,token,daysAgo){
     return new Promise(function(resolve,reject){
         try{
@@ -198,30 +206,7 @@ function GetDailyInsights(urlPath,token,daysAgo){
             }
             resolve(
                 GetAll(urlPath,params).then((results)=>{
-                    const metrics = {
-                        impressions: 0,
-                        reach: 0,
-                        followerCount: 0
-                    }
-                    if (results && Array.isArray(results)){
-                        results.forEach((metric)=>{
-                            if (typeof metric === 'object'){
-                                const value = getMetricValue(metric)
-                                switch (metric.name){
-                                    case 'impressions':
-                                        metrics.impressions += value;
-                                        break;
-                                    case 'reach':
-                                        metrics.reach += value;
-                                        break;
-                                    case 'follower_count':
-                                        metrics.followerCount += value;
-                                        break;
-                                }
-                            }
-                        })
-                    }
-                    return metrics;
+                    return helpers.aggregateDailyMetrics(results);
                 }).catch((err)=>{
                     throw (err)
                 })
@@ -230,18 +215,6 @@ function GetDailyInsights(urlPath,token,daysAgo){
             reject(e)
         }
     })
-}
-
-function getMetricValue(metric){
-    let value = 0;
-    if (typeof metric === 'object'){
-        if ('values' in metric && Array.isArray(metric.values)){
-            metric.values.forEach((val)=>{
-                value += val.value;
-            })
-        }
-    }
-    return value
 }
 
 

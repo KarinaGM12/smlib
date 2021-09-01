@@ -135,6 +135,13 @@ function formatPostResponse(response){
     }
 }
 
+/**
+ * Returns object with properties startDate and endDate as ISO date strings.
+ * Start date is numberOfDays ago from current date and end date is at most 30 
+ * days after start date
+ * @param {Number} numberOfDays Number of days ago to set start date
+ * @returns object with start date (n days ago) and end date
+ */
 function getDates(numberOfDays){
     const daysAgo = (Number.isInteger(numberOfDays)?numberOfDays:30);
     const daysAfterStart = (daysAgo > 30? 30:daysAgo);
@@ -152,6 +159,57 @@ function getDates(numberOfDays){
 
 }
 
+/**
+ * Returns aggregate for daily values in metric object
+ * @param {object} metric Object with daily values
+ * @returns {number} aggregated metric value
+ */
+function getMetricValue(metric){
+    let value = 0;
+    if (typeof metric === 'object'){
+        if ('values' in metric && Array.isArray(metric.values)){
+            metric.values.forEach((val)=>{
+                if (Number.isInteger(val.value)){
+                    value += val.value;
+                }
+            })
+        }
+    }
+    return value
+}
+
+/**
+ * Aggregates values for impressions,reach, and follower_count metrics in results
+ * @param {array} results Array containing metric object 
+ * @returns {object} Returns object with aggregated metrics
+ */
+function aggregateDailyMetrics(results){
+    const metrics = {
+        impressions: 0,
+        reach: 0,
+        followerCount: 0
+    }
+    if (results && Array.isArray(results)){
+        results.forEach((metric)=>{
+            if (typeof metric === 'object'){
+                const value = getMetricValue(metric)
+                switch (metric.name){
+                    case 'impressions':
+                        metrics.impressions += value;
+                        break;
+                    case 'reach':
+                        metrics.reach += value;
+                        break;
+                    case 'follower_count':
+                        metrics.followerCount += value;
+                        break;
+                }
+            }
+        })
+    }
+    return metrics
+}
+
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
@@ -162,5 +220,7 @@ module.exports = {
     isVersion: isVersion,
     formatPost: formatPostResponse,
     getDates:getDates,
+    getMetricValue: getMetricValue,
+    aggregateDailyMetrics: aggregateDailyMetrics,
 
 }
