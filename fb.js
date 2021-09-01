@@ -181,7 +181,7 @@ function getPostFields(){
     f.setItem('children{media_url}');
     f.setItem('comments_count');
     f.setItem('like_count');
-    f.setItem('insights.metric(impressions)');
+    f.setItem('insights.metric(impressions,engagement)');
     return f;
 }
 
@@ -198,7 +198,7 @@ function GetDailyInsights(urlPath,token,daysAgo){
         try{
             const dates = helpers.getDates(daysAgo)
             const params = {
-                'metric':'impressions,reach',
+                'metric':'impressions,reach,follower_count',
                 'period':'day',
                 'since': dates.startDate,
                 'until': dates.endDate,
@@ -217,7 +217,32 @@ function GetDailyInsights(urlPath,token,daysAgo){
     })
 }
 
-
+/**
+ * Returns countries and ciries for instagram user followers
+ * @param {string} urlPath path for user instagram insights. Ex: '/v11.0/{igUserID}/insights' 
+ * @param {string} token access token for Facebook API
+ * @returns {Array} results array
+ */
+function GetLifetimeInsights(urlPath,token){
+    return new Promise(function(resolve,reject){
+        try{
+            const params = {
+                'metric':'audience_country,audience_city',
+                'period':'lifetime',
+                'access_token':token
+            }
+            resolve(
+                GetAll(urlPath,params).then((results)=>{
+                    return results
+                }).catch((err)=>{
+                    throw (err)
+                })
+            )
+        }catch(e){
+            reject(e)
+        }
+    })
+}
 
 module.exports = {
     Get: Get,
@@ -225,4 +250,5 @@ module.exports = {
     GetAll: GetAll,
     GetPost: GetPostContent,
     GetInsights: GetDailyInsights,
+    GetAudiences: GetLifetimeInsights,
 }
