@@ -116,22 +116,28 @@ function isVersion(version){
  */
 function formatPostResponse(response){
     let impressions = 0;
+    let engagement = 0;
     if (typeof response === 'object'){
         if ('insights' in response){
             if ('data' in response.insights){
                 const data = response.insights.data;
                 if (data.length > 0){
-                    if(typeof data[0] === 'object'){
-                        if ('values' in data[0]){
-                            if (data[0].values.length > 0){
-                                impressions = data[0].values[0].value;
-                            }
+                    data.forEach((metric)=>{
+                        const value = getMetricValue(metric)
+                        switch (metric.name){
+                            case 'impressions':
+                                impressions = value;
+                                break;
+                            case 'engagement':
+                                engagement = value;
+                                break;
                         }
-                    }
+                    })
                 } 
            }
         }
         response.impressions = impressions;
+        response.engagement = engagement;
     }
 }
 
