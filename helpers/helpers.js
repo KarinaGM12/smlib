@@ -116,23 +116,104 @@ function isVersion(version){
  */
 function formatPostResponse(response){
     let impressions = 0;
+    let engagement = 0;
     if (typeof response === 'object'){
         if ('insights' in response){
             if ('data' in response.insights){
                 const data = response.insights.data;
                 if (data.length > 0){
-                    if(typeof data[0] === 'object'){
-                        if ('values' in data[0]){
-                            if (data[0].values.length > 0){
-                                impressions = data[0].values[0].value;
-                            }
+                    data.forEach((metric)=>{
+                        const value = getMetricValue(metric)
+                        switch (metric.name){
+                            case 'impressions':
+                                impressions = value;
+                                break;
+                            case 'engagement':
+                                engagement = value;
+                                break;
                         }
-                    }
+                    })
                 } 
            }
         }
         response.impressions = impressions;
+        response.engagement = engagement;
     }
+}
+
+/**
+ * Returns object with properties startDate and endDate as ISO date strings.
+ * Start date is numberOfDays ago from current date and end date is at most 30 
+ * days after start date
+ * @param {Number} numberOfDays Number of days ago to set start date
+ * @returns object with start date (n days ago) and end date
+ */
+function getDates(numberOfDays){
+    const daysAgo = (Number.isInteger(numberOfDays)?numberOfDays:30);
+    const daysAfterStart = (daysAgo > 30? 30:daysAgo);
+
+    let start = new Date();
+    start.setDate(start.getDate()-daysAgo);
+    const startDate = start.toISOString();
+    start.setDate(start.getDate()+daysAfterStart);
+    const endDate = start.toISOString();
+    
+    return {
+        startDate: startDate.substring(0,10),
+        endDate: endDate.substring(0,10),
+    }
+
+}
+
+/**
+ * Returns aggregate for daily values in metric object
+ * @param {object} metric Object with daily values
+ * @returns {number} aggregated metric value
+ */
+function getMetricValue(metric){
+    let value = 0;
+    if (typeof metric === 'object'){
+        if ('values' in metric && Array.isArray(metric.values)){
+            metric.values.forEach((val)=>{
+                if (Number.isInteger(val.value)){
+                    value += val.value;
+                }
+            })
+        }
+    }
+    return value
+}
+
+/**
+ * Aggregates values for impressions,reach, and follower_count metrics in results
+ * @param {array} results Array containing metric object 
+ * @returns {object} Returns object with aggregated metrics
+ */
+function aggregateDailyMetrics(results){
+    const metrics = {
+        impressions: 0,
+        reach: 0,
+        followerCount: 0
+    }
+    if (results && Array.isArray(results)){
+        results.forEach((metric)=>{
+            if (typeof metric === 'object'){
+                const value = getMetricValue(metric)
+                switch (metric.name){
+                    case 'impressions':
+                        metrics.impressions += value;
+                        break;
+                    case 'reach':
+                        metrics.reach += value;
+                        break;
+                    case 'follower_count':
+                        metrics.followerCount += value;
+                        break;
+                }
+            }
+        })
+    }
+    return metrics
 }
 
 module.exports = {
@@ -143,5 +224,9 @@ module.exports = {
     getAfterCursor: getAfterCursor,
     getNextCursor: getNextCursor,
     isVersion: isVersion,
-    formatPost: formatPostResponse
+    formatPost: formatPostResponse,
+    getDates:getDates,
+    getMetricValue: getMetricValue,
+    aggregateDailyMetrics: aggregateDailyMetrics,
+
 }
