@@ -123,4 +123,145 @@ describe('formatPostResponse',()=>{
             assert.fail();
         }
     })
+    it('sets impressions and engagement as input object properties',()=>{
+        let response = {
+            insights: {
+                data: [
+                  {
+                    name: 'impressions',
+                    values: [
+                      {
+                        value: 1
+                      }
+                    ],
+                  },
+                  {
+                    name: 'engagement',
+                    period: 'lifetime',
+                    values: [
+                      {
+                        value: 4
+                      }
+                    ],
+                  }
+                ]
+            }
+        }
+        helpers.formatPost(response);
+        assert.equal(response.engagement,4);
+        assert.equal(response.impressions,1);
+    })
+})
+
+describe('getDates',()=>{
+    it('sets start date as 30 days ago and end date as today when input is not number',()=>{
+        const dates = helpers.getDates(['test']);
+        let d = new Date();
+        assert.equal(dates.endDate, d.toISOString().substring(0,10));
+        d.setDate(d.getDate() - 30);
+        assert.equal(dates.startDate,d.toISOString().substring(0,10));
+    })
+    it('sets start date according to input and end date as 30 days later',()=>{
+        const daysAgo = 45;
+        const dates = helpers.getDates(daysAgo);
+        let d = new Date();
+        d.setDate(d.getDate()-daysAgo);
+        assert.equal(dates.startDate,d.toISOString().substring(0,10));
+        d.setDate(d.getDate()+30);
+        assert.equal(dates.endDate,d.toISOString().substring(0,10));
+    })
+    it('sets start date according to input and end date as today',()=>{
+        const daysAgo = 5;
+        const dates = helpers.getDates(daysAgo);
+        let d = new Date();
+        assert.equal(dates.endDate,d.toISOString().substring(0,10));
+        d.setDate(d.getDate()-daysAgo);
+        assert.equal(dates.startDate,d.toISOString().substring(0,10));
+    })
+})
+
+describe('getMetricValue',()=>{
+    it('returns 0 when metric is not an object',()=>{
+        const val = helpers.getMetricValue(['test']);
+        assert.equal(val,0);
+    })
+    it('returns 0 when metric does not contain values property',()=>{
+        const val = helpers.getMetricValue({test: 'Test'})
+        assert.equal(val,0);
+    })
+    it('returns 0 when metric does not contain array values',()=>{
+        const val = helpers.getMetricValue({values: 'test'})
+        assert.equal(val,0);
+    })
+    it('returns 0 when metric does not contain value property',()=>{
+        const val = helpers.getMetricValue({values: [{test: 1}]});
+        assert.equal(val,0);
+    })
+    it('returns 1 when metric contains integer values',()=>{
+        const val = helpers.getMetricValue({values: [{value: 1}]});
+        assert.equal(val,1);
+    })
+})
+
+describe('aggregateDailyMetrics',()=>{
+    it('returns zero value results when input is not array',()=>{
+        const results = helpers.aggregateDailyMetrics({})
+        assert.equal(results.impressions,0);
+        assert.equal(results.reach,0);
+        assert.equal(results.followerCount,0);
+    })
+    it('returns zero value results when input does not contain metric with values',()=>{
+        const results = helpers.aggregateDailyMetrics({values: true})
+        assert.equal(results.impressions,0);
+        assert.equal(results.reach,0);
+        assert.equal(results.followerCount,0);
+    })
+    it('returns zero value results when input is empty',()=>{
+        const results = helpers.aggregateDailyMetrics([])
+        assert.equal(results.impressions,0);
+        assert.equal(results.reach,0);
+        assert.equal(results.followerCount,0);
+    })
+    it('returns non zero results when input has values for each metric',()=>{
+        const results = helpers.aggregateDailyMetrics([
+            {
+                name: 'impressions',
+                values: [
+                    {
+                        value: 1
+                    }
+                ]
+            },
+            {
+                name: 'reach',
+                values: [
+                    {
+                        value: 2
+                    },
+                    {
+                        value: 3   
+                    }
+                ]
+            },
+            {
+                name: 'follower_count',
+                values: [
+                    {
+                        value: 3
+                    }
+                ]
+            },
+            {
+                name:'follower_count',
+                values: [
+                    {
+                        value: 1
+                    }
+                ]
+            }
+        ])
+        assert.equal(results.impressions,1);
+        assert.equal(results.reach,5);
+        assert.equal(results.followerCount,4);
+    })
 })

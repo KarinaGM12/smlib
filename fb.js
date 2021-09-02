@@ -1,7 +1,7 @@
 const helpers = require('./helpers/helpers')
 const discovery = require('./discovery')
 const https = require('https');
-const fields = require('./fields')
+const fields = require('./fields');
 /**
  * Get request to facebook API
  * @param {string} urlPath 
@@ -181,14 +181,74 @@ function getPostFields(){
     f.setItem('children{media_url}');
     f.setItem('comments_count');
     f.setItem('like_count');
-    f.setItem('insights.metric(impressions)');
+    f.setItem('insights.metric(impressions,engagement)');
     return f;
 }
 
+/**
+ * Returns metrics reach,impressions,and follower count metrics
+ * aggregated over a time range from n days ago up to current date
+ * @param {string} urlPath path for user instagram insights. Ex: '/v11.0/{igUserID}/insights'
+ * @param {string} token access token for Facebook API
+ * @param {Number} daysAgo Number of days ago to retrieve metrics
+ * @returns 
+ */
+function GetDailyInsights(urlPath,token,daysAgo){
+    return new Promise(function(resolve,reject){
+        try{
+            const dates = helpers.getDates(daysAgo)
+            const params = {
+                'metric':'impressions,reach,follower_count',
+                'period':'day',
+                'since': dates.startDate,
+                'until': dates.endDate,
+                'access_token':token
+            }
+            resolve(
+                GetAll(urlPath,params).then((results)=>{
+                    return helpers.aggregateDailyMetrics(results);
+                }).catch((err)=>{
+                    throw (err)
+                })
+            )
+        }catch(e){
+            reject(e)
+        }
+    })
+}
+
+/**
+ * Returns countries and ciries for instagram user followers
+ * @param {string} urlPath path for user instagram insights. Ex: '/v11.0/{igUserID}/insights' 
+ * @param {string} token access token for Facebook API
+ * @returns {Array} results array
+ */
+function GetLifetimeInsights(urlPath,token){
+    return new Promise(function(resolve,reject){
+        try{
+            const params = {
+                'metric':'audience_country,audience_city',
+                'period':'lifetime',
+                'access_token':token
+            }
+            resolve(
+                GetAll(urlPath,params).then((results)=>{
+                    return results
+                }).catch((err)=>{
+                    throw (err)
+                })
+            )
+        }catch(e){
+            reject(e)
+        }
+    })
+}
 
 module.exports = {
     Get: Get,
     Discover: DiscoverPosts,
     GetAll: GetAll,
     GetPost: GetPostContent,
+    GetInsights: GetDailyInsights,
+    GetAudiences: GetLifetimeInsights,
 }
