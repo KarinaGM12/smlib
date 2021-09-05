@@ -3,12 +3,14 @@ const discovery = require('./discovery')
 const https = require('https');
 const fields = require('./fields');
 /**
- * Get request to facebook API
+ * Get request to Facebook API
  * @param {string} urlPath 
- * url path for request. Must start with api version ex: /v11.0/..
- * @param {string} params 
- * query parameters as key value pais
- * @returns {Promise} Promise object represents request payload
+ * URL path for request. Must start with api version ex: /v11.0/..
+ * @param {Object} params Query parameters as key value pairs. 
+ * Check the documentation https://developers.facebook.com/docs/instagram for valid key value pairs
+ * @param {string} params.fields Comma separated list of fields and edges to be returned
+ * @param {string} params.access_token Facebook API access token
+ * @return {Promise<Object,Error>} Promise to the request response
  * 
  */
 const Get = function (urlPath, params){
@@ -25,16 +27,16 @@ const Get = function (urlPath, params){
 }
 
 /** 
- * Business discovery request for facebook API
+ * Business discovery request for Facebook API
  * @param {string} urlPath 
- * url path for request. Must start with api version ex: /v11.0/..
- * @param {Object} fields object with the following string properties: userName,startDate,endDate,after
+ * URL path for request. Must start with api version ex: /v11.0/..
+ * @param {Object} fields Object with the following properties: userName,startDate,endDate
  * @param {string} fields.userName The userName of the instagram account to query (required)
  * @param {string} fields.startDate Start date of request in ISO Layout 'YYYY-MM-DD'
  * @param {string} fields.endDate End date of request in ISO Layout 'YYYY-MM-DD'
- * @param {string} token Facebook graph API token
+ * @param {string} token Facebook API access token
  * @param {Array} posts Array to append results to
- * @returns {Promise} Promise object represents request payload
+ * @returns {Promise<Object,Error>} Promise to the request response
 */
 function DiscoverPosts(urlPath, fields, token,posts){
     
@@ -64,13 +66,13 @@ function DiscoverPosts(urlPath, fields, token,posts){
 
 /**
  * 
- * Get request to facebook API reading paginated results.
+ * Get request to Facebook API reading paginated results.
  * Results will be read until no more 'next' cursor is returned in response
  * @param {string} urlPath 
- * url path for request. Must start with api version ex: /v11.0/..
- * @param {string} params 
- * query parameters as key value pais
- * @returns {Promise} Promise object represents request payload
+ * URL path for request. Must start with api version ex: /v11.0/..
+ * @param {string} params Query parameters as key value pairs. 
+ * Check the documentation https://developers.facebook.com/docs/instagram for valid key value pairs
+ * @returns {Promise<Object[],Error>} Promise to the request response
  */
 function GetAll(urlPath,params){
     let results = [];
@@ -139,13 +141,33 @@ function getRequest(urlParams){
 }
 
 /**
- * GetPostContent gets caption,media_type,media_url,childrens media_url,comment_count,like_count, and impressions 
- * from an Instagram post.  (ex '/v11.0/12437548796'
- * woule request post content for post with Id 12437548796)
- * @param {string} urlPath url path for request. Must start with api version ex: '/v11.0/123412341234'
- * where 12341234 represents the post you want to query
- * @param {string} token Facebook graph API token
- * @returns {Promise} Promise object represents request payload
+ * @typedef Children
+ * @param {Post[]} data Array with Post's children
+ */
+
+/**
+ * 
+ * @typedef Post
+ * @param {string} id Post ID
+ * @param {string} timestamp Date 
+ * @param {string} caption Post caption
+ * @param {string} media_type Post type (CAROUSEL_ALBUM, IMAGE, or VIDEO)
+ * @param {string} media_url video or image URL
+ * @param {number} comments_count Comment counts on the post
+ * @param {number} like_count Like counts on the post
+ * @param {number} impressions Number of times post has been seen
+ * @param {number} engagement Sum of likes_count, comment_count and saved counts on post
+ * @param {Object} insights Social interaction metrics on the post
+ * @param {Children} children Post's children 
+ */
+
+/**
+ * Returns post caption,media_type,media_url,children,media_url,comment_count,like_count, and impressions 
+ * from an Instagram post. Ex. '/v11.0/12437548796' would request post content for post with Id 12437548796
+ * @param {string} urlPath URL path for request. Must start with api version and end with post ID
+ * ex: '/v11.0/12341234' where 12341234 is the post ID you want to query
+ * @param {string} token Facebook API access token
+ * @returns {Promise<Post,Error>} Promise object represents request payload
  */
 function GetPostContent(urlPath,token){
     const fieldsSet = getPostFields();
@@ -186,12 +208,22 @@ function getPostFields(){
 }
 
 /**
- * Returns metrics reach,impressions,and follower count metrics
+ * 
+ * @typedef Metrics
+ * @param {number} reach Number of unique users ho have viewed at least one post from the Instagram user
+ * @param {number} impressions Number of times posts from the Instagram user have been seen
+ * @param {number} follower_count Sum of new followers within the specified range
+ */
+
+/**
+ * Returns reach,impressions,and follower_count metrics of an instagram profile
  * aggregated over a time range from n days ago up to current date
- * @param {string} urlPath path for user instagram insights. Ex: '/v11.0/{igUserID}/insights'
+ * @param {string} urlPath URL path for request. Must start with api version, 
+ * then indicate Instagram user ID you want to query, and end with 'insights' path. Ex: '/v11.0/123412345/insights'
+ * where 123412345 is the Instagram user Id
  * @param {string} token access token for Facebook API
- * @param {Number} daysAgo Number of days ago to retrieve metrics
- * @returns 
+ * @param {Number} daysAgo Number of days you want to query. Ex 2 means you want to query insights from 2 days ago till today
+ * @returns {Promise<Metrics|Error>} Promise object represents request payload
  */
 function GetDailyInsights(urlPath,token,daysAgo){
     return new Promise(function(resolve,reject){
@@ -218,10 +250,12 @@ function GetDailyInsights(urlPath,token,daysAgo){
 }
 
 /**
- * Returns countries and ciries for instagram user followers
- * @param {string} urlPath path for user instagram insights. Ex: '/v11.0/{igUserID}/insights' 
+ * Returns countries and cities for Instagram user followers
+ * @param {string} urlPath URL path for request. Must start with api version. 
+ * then indicate Instagram user ID you want to query, and end with 'insights' path. Ex: '/v11.0/123412345/insights'
+ * where 123412345 is the Instagram user Id
  * @param {string} token access token for Facebook API
- * @returns {Array} results array
+ * @returns {Promise<Array,Error>} Promise object represents request payload
  */
 function GetLifetimeInsights(urlPath,token){
     return new Promise(function(resolve,reject){
