@@ -278,6 +278,23 @@ function GetLifetimeInsights(urlPath,token){
     })
 }
 
+function DiscoverUserPosts(urlPath,userName,daysAgo,token){
+    return new Promise(function(resolve,reject){
+        try{
+            const dates = helpers.getDateRange(daysAgo);
+            const fields ={
+                userName: userName,
+                startDate: dates.startDate,
+                endDate: dates.endDate,
+            }
+            let posts =[];
+            resolve(DiscoverPosts(urlPath,fields,token,posts));
+        }catch(e){
+            reject(e)
+        }
+    });
+}
+
 module.exports = {
     Get: Get,
     Discover: DiscoverPosts,
@@ -285,4 +302,5 @@ module.exports = {
     GetPost: GetPostContent,
     GetInsights: GetDailyInsights,
     GetAudiences: GetLifetimeInsights,
+    DiscoverUserPosts: DiscoverUserPosts,
 }

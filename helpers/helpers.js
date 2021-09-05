@@ -216,6 +216,18 @@ function aggregateDailyMetrics(results){
     return metrics
 }
 
+function getDateRange(numberOfDays){
+    const daysAgo = (Number.isInteger(numberOfDays));
+    let start = new Date();
+    const endDate = start.toISOString();
+    start.setDate(start.getDate()-daysAgo);
+    const startDate = start.toISOString();
+    return {
+        startDate: startDate.substring(0,10),
+        endDate: endDate.substring(0,10)
+    }
+}
+
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
@@ -228,5 +240,6 @@ module.exports = {
     getDates:getDates,
     getMetricValue: getMetricValue,
     aggregateDailyMetrics: aggregateDailyMetrics,
+    getDateRange: getDateRange,
 
 }
