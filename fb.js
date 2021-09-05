@@ -142,23 +142,23 @@ function getRequest(urlParams){
 
 /**
  * @typedef Children
- * @param {Post[]} data Array with Post's children
+ * @property {Post[]} data Array with Post's children
  */
 
 /**
  * 
  * @typedef Post
- * @param {string} id Post ID
- * @param {string} timestamp Date 
- * @param {string} caption Post caption
- * @param {string} media_type Post type (CAROUSEL_ALBUM, IMAGE, or VIDEO)
- * @param {string} media_url video or image URL
- * @param {number} comments_count Comment counts on the post
- * @param {number} like_count Like counts on the post
- * @param {number} impressions Number of times post has been seen
- * @param {number} engagement Sum of likes_count, comment_count and saved counts on post
- * @param {Object} insights Social interaction metrics on the post
- * @param {Children} children Post's children 
+ * @property {string} id Post ID
+ * @property {string} timestamp Date 
+ * @property {string} caption Post caption
+ * @property {string} media_type Post type (CAROUSEL_ALBUM, IMAGE, or VIDEO)
+ * @property {string} media_url video or image URL
+ * @property {number} comments_count Comment counts on the post
+ * @property {number} like_count Like counts on the post
+ * @property {number} impressions Number of times post has been seen
+ * @property {number} engagement Sum of likes_count, comment_count and saved counts on post
+ * @property {Object} insights Social interaction metrics on the post
+ * @property {Children} children Post's children 
  */
 
 /**
@@ -210,9 +210,9 @@ function getPostFields(){
 /**
  * 
  * @typedef Metrics
- * @param {number} reach Number of unique users ho have viewed at least one post from the Instagram user
- * @param {number} impressions Number of times posts from the Instagram user have been seen
- * @param {number} follower_count Sum of new followers within the specified range
+ * @property {number} reach Number of unique users ho have viewed at least one post from the Instagram user
+ * @property {number} impressions Number of times posts from the Instagram user have been seen
+ * @property {number} follower_count Sum of new followers within the specified range
  */
 
 /**
