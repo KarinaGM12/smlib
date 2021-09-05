@@ -26,6 +26,23 @@ const Get = function (urlPath, params){
     });
 }
 
+/**
+ * 
+ * @typedef PostChildren 
+ * @property {[]DiscoveryPosts} data Array with posts children
+ */
+
+/**
+ * 
+ * @typedef DiscoveryPosts 
+ * @property {string} timestamp Date when posts was posted 
+ * @property {string} caption Post caption  
+ * @property {string} media_type Post type (CAROUSEL_ALBUM, IMAGE, or VIDEO)
+ * @property {string} media_url video or image URL
+ * @property {PostChildren} children Post's children 
+ * @property {string} id Post ID
+ */
+
 /** 
  * Business discovery request for Facebook API
  * @param {string} urlPath 
@@ -36,7 +53,7 @@ const Get = function (urlPath, params){
  * @param {string} fields.endDate End date of request in ISO Layout 'YYYY-MM-DD'
  * @param {string} token Facebook API access token
  * @param {Array} posts Array to append results to
- * @returns {Promise<Object,Error>} Promise to the request response
+ * @returns {Promise<DiscoveryPosts[],Error>} Promise to the request response
 */
 function DiscoverPosts(urlPath, fields, token,posts){
     
@@ -278,6 +295,16 @@ function GetLifetimeInsights(urlPath,token){
     })
 }
 
+
+/** 
+ * Returns posts for Instagram user using business dicovery since 'daysAgo' till current date
+ * @param {string} urlPath 
+ * URL path for request. Must start with api version ex: /v11.0/..
+ * @param {string} userName The userName of the instagram account to query (required)
+ * @param {number} daysAgo  Number of days you want to query. Ex 2 means you want to query posts from 2 days ago till today
+ * @param {string} token Facebook API access token
+ * @returns {Promise<DiscoveryPosts[],Error>} Promise to the request response
+*/
 function DiscoverUserPosts(urlPath,userName,daysAgo,token){
     return new Promise(function(resolve,reject){
         try{

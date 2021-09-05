@@ -119,7 +119,6 @@ scope2.filteringPath(
   (path)=>{
     let newPath = path.replace(/since=[0-9]{4}-[0-9]{2}-[0-9]{2}/g,'since=XXX')
     let newP2 = newPath.replace(/until=[0-9]{4}-[0-9]{2}-[0-9]{2}/g,'until=XXX')
-    console.log(newP2)
     return newP2
   }
 )
@@ -167,6 +166,39 @@ scope2.get('/insights?access_token=testtoken&pretty=0&since=XXX&until=XXX&metric
     "previous": "previouscursor"
   }
 })
+
+const scope3 = nock('https://graph.facebook.com/v11.0')
+scope3.filteringPath(
+  (path)=>{
+    let newPath = path.replace(/since\([0-9]{4}-[0-9]{2}-[0-9]{2}\)/g,'since(xxx)')
+    let newP2 = newPath.replace(/until\([0-9]{4}-[0-9]{2}-[0-9]{2}\)/g,'until(xxx)')
+    return newP2
+  }
+)
+scope3.get('/13212824194804290?fields=business_discovery.username(esmuellert)%7Bmedia.since(xxx).until(xxx)%7Btimestamp%2Ccaption%2Cmedia_type%2Cmedia_url%2Cchildren%7Bmedia_url%7D%7D%7D&access_token=testtoken')
+.reply(200,{
+  "business_discovery": {
+    "media": {
+      "data": [
+        {
+          caption: 'We had a lot of fun out there 🥳⚽️\n',
+          timestamp: '2021-08-25T20:42:00+0000',
+          media_type: 'IMAGE',
+          media_url: 'https://scontent.cdninstagram.com/v/t51.29350-15/240462632_4562131030514090_7631716432766009069_n.jpg?_nc_cat=1&ccb=1-5&_nc_sid=8ae9d6&_nc_ohc=nENJvhzVM8wAX84N08j&_nc_ht=scontent.cdninstagram.com&edm=AL-3X8kEAAAA&oh=a406875884d4cf01a7741002cc0c85cc&oe=613A736F',
+          id: '13212824198804290'
+        },
+        {
+          caption: 'We had a lot of fun out there 🥳⚽️\n',
+          timestamp: '2021-08-26T20:42:00+0000',
+          media_type: 'IMAGE',
+          media_url: 'https://scontent.cdninstagram.com/v/t51.29350-15/240462632_4562131030514090_7631716432766009069_n.jpg?_nc_cat=1&ccb=1-5&_nc_sid=8ae9d6&_nc_ohc=nENJvhzVM8wAX84N08j&_nc_ht=scontent.cdninstagram.com&edm=AL-3X8kEAAAA&oh=a406875884d4cf01a7741002cc0c85cc&oe=613A736F',
+          id: '13212824194804290'
+        },
+      ]
+    }
+  }
+})
+
 
 
 describe('Get',()=>{
@@ -259,5 +291,13 @@ describe('GetAll',()=>{
     })
     let result = await promise;
     assert.deepEqual(result,test);
+  })
+})
+
+describe('DicoverUserPosts',()=>{
+  it('Returns users posts',async ()=>{
+    let promise = fb.DiscoverUserPosts('/v11.0/13212824194804290','esmuellert',18,'testtoken')
+    let result = await promise;
+    assert.equal(result.length,2);
   })
 })

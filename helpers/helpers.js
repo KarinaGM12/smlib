@@ -216,8 +216,14 @@ function aggregateDailyMetrics(results){
     return metrics
 }
 
+/**
+ * Returns object with startDate and endDate as ISO strings. 
+ * Where endDate is current date and startDate is 'daysAgo' before endDate
+ * @param {number} numberOfDays Number of days ago to set start date
+ * @returns {Object} 
+ */
 function getDateRange(numberOfDays){
-    const daysAgo = (Number.isInteger(numberOfDays));
+    const daysAgo = (Number.isInteger(numberOfDays)?numberOfDays:15);
     let start = new Date();
     const endDate = start.toISOString();
     start.setDate(start.getDate()-daysAgo);
