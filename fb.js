@@ -29,7 +29,7 @@ const Get = function (urlPath, params){
 /**
  * 
  * @typedef PostChildren 
- * @property {[]DiscoveryPosts} data Array with posts children
+ * @property {DiscoveryPosts[]} data Array with posts children
  */
 
 /**
