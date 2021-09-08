@@ -12,22 +12,22 @@ This module provides a simple API to
 <dt><a href="#Get">Get(urlPath, params)</a> ⇒ <code>Promise.&lt;Object, Error&gt;</code></dt>
 <dd><p>Get request to Facebook API</p>
 </dd>
-<dt><a href="#DiscoverPosts">DiscoverPosts(urlPath, fields, token, posts)</a> ⇒ <code>Promise.&lt;Array.&lt;DiscoveryPosts&gt;, Error&gt;</code></dt>
+<dt><a href="#DiscoverPosts">Discover(urlPath, fields, token, posts)</a> ⇒ <code>Promise.&lt;Array.&lt;DiscoveryPosts&gt;, Error&gt;</code></dt>
 <dd><p>Business discovery request for Facebook API</p>
 </dd>
 <dt><a href="#GetAll">GetAll(urlPath, params)</a> ⇒ <code>Promise.&lt;Array.&lt;Object&gt;, Error&gt;</code></dt>
 <dd><p>Get request to Facebook API reading paginated results.
 Results will be read until no more &#39;next&#39; cursor is returned in response</p>
 </dd>
-<dt><a href="#GetPostContent">GetPostContent(urlPath, token)</a> ⇒ <code>Promise.&lt;Post, Error&gt;</code></dt>
+<dt><a href="#GetPostContent">GetPost(urlPath, token)</a> ⇒ <code>Promise.&lt;Post, Error&gt;</code></dt>
 <dd><p>Returns post caption,media_type,media_url,children,media_url,comment_count,like_count, and impressions 
 from an Instagram post. Ex. &#39;/v11.0/12437548796&#39; would request post content for post with Id 12437548796</p>
 </dd>
-<dt><a href="#GetDailyInsights">GetDailyInsights(urlPath, token, daysAgo)</a> ⇒ <code>Promise.&lt;(Metrics|Error)&gt;</code></dt>
+<dt><a href="#GetDailyInsights">GetInsights(urlPath, token, daysAgo)</a> ⇒ <code>Promise.&lt;(Metrics|Error)&gt;</code></dt>
 <dd><p>Returns reach,impressions,and follower_count metrics of an instagram profile
 aggregated over a time range from n days ago up to current date</p>
 </dd>
-<dt><a href="#GetLifetimeInsights">GetLifetimeInsights(urlPath, token)</a> ⇒ <code>Promise.&lt;Array, Error&gt;</code></dt>
+<dt><a href="#GetLifetimeInsights">GetAudiences(urlPath, token)</a> ⇒ <code>Promise.&lt;Array, Error&gt;</code></dt>
 <dd><p>Returns countries and cities for Instagram user followers</p>
 </dd>
 <dt><a href="#DiscoverUserPosts">DiscoverUserPosts(urlPath, userName, daysAgo, token)</a> ⇒ <code>Promise.&lt;Array.&lt;DiscoveryPosts&gt;, Error&gt;</code></dt>
@@ -40,7 +40,7 @@ aggregated over a time range from n days ago up to current date</p>
 <dl>
 <dt><a href="#PostChildren">PostChildren</a></dt>
 <dd></dd>
-<dt><a href="#DiscoveryPosts">DiscoveryPosts</a></dt>
+<dt><a href="#DiscoveryPosts">Discover</a></dt>
 <dd></dd>
 <dt><a href="#Children">Children</a></dt>
 <dd></dd>
@@ -79,7 +79,7 @@ fb.Get('/v11.0/your_ig_user_id',{
 
 <a name="DiscoverPosts"></a>
 
-## DiscoverPosts(urlPath, fields, token, posts) ⇒ <code>Promise.&lt;Array.&lt;DiscoveryPosts&gt;, Error&gt;</code>
+## Discover(urlPath, fields, token, posts) ⇒ <code>Promise.&lt;Array.&lt;DiscoveryPosts&gt;, Error&gt;</code>
 Business discovery request for Facebook API
 
 **Kind**: global function  
@@ -135,7 +135,7 @@ fb.GetAll('/v11.0/your_ig_user_id/media',{
 ```
 <a name="GetPostContent"></a>
 
-## GetPostContent(urlPath, token) ⇒ <code>Promise.&lt;Post, Error&gt;</code>
+## GetPost(urlPath, token) ⇒ <code>Promise.&lt;Post, Error&gt;</code>
 Returns post caption,media_type,media_url,children,media_url,comment_count,like_count, and impressions 
 from an Instagram post. Ex. '/v11.0/12437548796' would request post content for post with Id 12437548796
 
@@ -158,7 +158,7 @@ fb.GetPost('/v11.0/your_post_id','your_access_token').then((data)=>{
 
 <a name="GetDailyInsights"></a>
 
-## GetDailyInsights(urlPath, token, daysAgo) ⇒ <code>Promise.&lt;(Metrics\|Error)&gt;</code>
+## GetInsights(urlPath, token, daysAgo) ⇒ <code>Promise.&lt;(Metrics\|Error)&gt;</code>
 Returns reach,impressions,and follower_count metrics of an instagram profile
 aggregated over a time range from n days ago up to current date
 
@@ -182,7 +182,7 @@ fb.GetInsights('/v11.0/your_ig_user/insights','your_access_token',11).then((data
 
 <a name="GetLifetimeInsights"></a>
 
-## GetLifetimeInsights(urlPath, token) ⇒ <code>Promise.&lt;Array, Error&gt;</code>
+## GetAudiences(urlPath, token) ⇒ <code>Promise.&lt;Array, Error&gt;</code>
 Returns countries and cities for Instagram user followers
 
 **Kind**: global function  
