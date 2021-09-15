@@ -234,6 +234,33 @@ function getDateRange(numberOfDays){
     }
 }
 
+function formatFbPostMetrics(response){
+    const out = {
+        reactions: 0,
+        comments: 0
+    }
+    if (typeof response === 'object'){
+        if('comments' in response){
+            if('summary' in response.comments){
+                if ('total_count' in response.comments.summary){
+                    const value = response.comments.summary;
+                    out.comments = value.total_count;
+                }
+            }
+        }
+        if('reactions' in response){
+            if('summary' in response.reactions){
+                if ('total_count' in response.reactions.summary){
+                    const value = response.reactions.summary;
+                    out.reactions = value.total_count;
+                }
+            }
+        }
+    }
+    
+    return out;
+}
+
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
@@ -247,5 +274,5 @@ module.exports = {
     getMetricValue: getMetricValue,
     aggregateDailyMetrics: aggregateDailyMetrics,
     getDateRange: getDateRange,
-
+    formatFbPostMetrics: formatFbPostMetrics,
 }
