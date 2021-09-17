@@ -267,12 +267,18 @@ function GetDailyInsights(urlPath,token,daysAgo){
 }
 
 /**
+ * @typedef Audiences
+ * @property {object} countries Object whose properties are the country codes from Instagram followers, 
+ * with property values as the number of followers fromeach country.
+ * @property {object} citues Object whose propertiesare the city names, with property values as the number of followers from each city 
+ */
+/**
  * Returns countries and cities for Instagram user followers
  * @param {string} urlPath URL path for request. Must start with api version. 
  * then indicate Instagram user ID you want to query, and end with 'insights' path. Ex: '/v11.0/123412345/insights'
  * where 123412345 is the Instagram user Id
  * @param {string} token access token for Facebook API
- * @returns {Promise<Array,Error>} Promise object represents request payload
+ * @returns {Promise<Audiences|Error>} Promise object represents request payload
  */
 function GetLifetimeInsights(urlPath,token){
     return new Promise(function(resolve,reject){
@@ -284,7 +290,7 @@ function GetLifetimeInsights(urlPath,token){
             }
             resolve(
                 GetAll(urlPath,params).then((results)=>{
-                    return results
+                    return helpers.formatAudiencesResponse(results)
                 }).catch((err)=>{
                     throw (err)
                 })
