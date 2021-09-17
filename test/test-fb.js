@@ -199,6 +199,75 @@ scope3.get('/13212824194804290?fields=business_discovery.username(esmuellert)%7B
   }
 })
 
+const scope4 = nock('https://graph.facebook.com/v11.0')
+scope4.filteringPath(
+  (path)=>{
+    let newPath = path.replace(/since=[0-9]{4}-[0-9]{2}-[0-9]{2}/g,'since=xxx')
+    return newPath
+  }
+)
+scope4.get('/323653064059300/posts?fields=id%2Cmessage%2Ctype%2Cfull_picture.as(picture_uri)%2Csource.as(video_uri)%2Ccreated_time&since=xxx&access_token=testtoken')
+.reply(200,{
+  "data": [
+    {
+      "id": "323653064059300_405439083527475",
+      "message": "This is a video post📽",
+      "type": "video",
+      "picture_uri": "https://scontent...",
+      "video_uri": "https://video...",
+      "created_time": "2021-09-11T04:15:20+0000"
+    },
+    {
+      "id": "323653064059300_405667800917291",
+      "message": "This is a blank post",
+      "type": "photo",
+      "picture_uri": "https://scontent...",
+      "created_time": "2021-09-11T04:06:31+0000"
+    }
+  ]
+})
+
+scope4.get('/323653064059300_405667800917291?fields=comments.summary(total_count).limit(1)%2Creactions.summary(total_count).limit(1)&access_token=testtoken')
+.reply(200,{
+  "comments": {
+    "data": [
+      {
+        "created_time": "2021-09-12T03:29:15+0000",
+        "from": {
+          "name": "Someone",
+          "id": "405443200193819"
+        },
+        "message": "This is a posts",
+        "id": "405443200193819_604104460317603"
+      }
+    ],
+    "paging": {
+      "cursors": {
+        "before": "Uy...",
+        "after": "Uy..."
+      },
+      "next": "https://graph.facebook.com/v11.0/..."
+    },
+    "summary": {
+      "total_count": 2
+    }
+  },
+  "reactions": {
+    "data": [
+    ],
+    "paging": {
+      "cursors": {
+        "before": "QVF...",
+        "after": "QVF..."
+      },
+      "next": "https://graph.facebook.com/v11.0/..."
+    },
+    "summary": {
+      "total_count": 3
+    }
+  },
+  "id": "323653064059300_405667800917291"
+})
 
 
 describe('Get',()=>{
@@ -299,5 +368,22 @@ describe('DicoverUserPosts',()=>{
     let promise = fb.DiscoverUserPosts('/v11.0/13212824194804290','esmuellert',18,'testtoken')
     let result = await promise;
     assert.equal(result.length,2);
+  })
+})
+
+describe('GetFbPosts',()=>{
+  it('Returns users posts',async ()=>{
+    let promise = fb.GetFbPosts('/v11.0/323653064059300/posts',3,'testtoken')
+    let result = await promise;
+    assert.equal(result.length,2);
+  })
+})
+
+describe('GetFbPostMetrics',()=>{
+  it('Returns post metrics',async ()=>{
+    let promise = fb.GetFbPostMetrics('/v11.0/323653064059300_405667800917291','testtoken')
+    let result = await promise;
+    assert.equal(result.comments,2);
+    assert.equal(result.reactions,3);
   })
 })

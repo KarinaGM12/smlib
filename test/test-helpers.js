@@ -265,3 +265,32 @@ describe('aggregateDailyMetrics',()=>{
         assert.equal(results.followerCount,4);
     })
 })
+
+describe('formatFbPostMetrics',()=>{
+    it('returns object with zero value metrics when response is not object',()=>{
+        const results = helpers.formatFbPostMetrics('test');
+        assert.equal(results.comments,0);
+        assert.equal(results.reactions,0);
+    })
+    it('returns object with zero value metrics when response does not have summary',()=>{
+        const results = helpers.formatFbPostMetrics({});
+        assert.equal(results.comments,0);
+        assert.equal(results.reactions,0);
+    })
+    it('returns object with metrics when response contains summary and total count',()=>{
+        const results = helpers.formatFbPostMetrics({
+            reactions: {
+                summary: {
+                    total_count: 2
+                }
+            },
+            comments: {
+                summary: {
+                    total_count: 3
+                }
+            }
+        });
+        assert.equal(results.comments,3);
+        assert.equal(results.reactions,2);
+    })
+})

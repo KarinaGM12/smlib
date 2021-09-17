@@ -322,6 +322,80 @@ function DiscoverUserPosts(urlPath,userName,daysAgo,token){
     });
 }
 
+/**
+ * 
+ * @typedef Post
+ * @property {string} id Post ID
+ * @property {string} message Post message
+ * @property {string} type Post type, ex: video, photo
+ * @property {string} picture_uri Post image uri if it contains a picture
+ * @property {string} video_uri Post video uri if it contains a video
+ * @property {string} created_time The time the post was published
+ */
+
+/**
+ * Returns Facebook user posts 
+ * @param {string} urlPath URL path for request. Must start with api version ex: /v11.0/..
+ * @param {Number} daysAgo Number of days you want to query. Ex 2 means you want to query posts from 2 days ago till today
+ * @param {string} token Facebook API access token
+ * @returns {Promise<Post[],Error>} Promise to the request response
+ */
+function GetFbPosts(urlPath, daysAgo,token){
+    return new Promise(function(resolve,reject){
+        try{
+            const dates = helpers.getDateRange(daysAgo)
+            const params = {
+                'fields':'id,message,type,full_picture.as(picture_uri),source.as(video_uri),created_time',
+                'since':dates.startDate,
+                'access_token':token
+            }
+            resolve(
+                GetAll(urlPath,params).then((results)=>{
+                    return results
+                }).catch((err)=>{
+                    throw (err)
+                })
+            )
+        }catch(e){
+            reject(e)
+        }
+    });
+}
+
+/**
+ * 
+ * @typedef PostMetric
+ * @property {number} comments Number of people who commented post
+ * @property {number} reactions Number of people who reacted to post
+ */
+
+/**
+ * Returns Facebook user post metrics
+ * @param {string} urlPath URL path for request. Must start with api version ex: /v11.0/..
+ * @param {string} token Facebook API access token
+ * @returns {Promise<Promise,Error>} Promise to the request response
+ */
+function GetFbPostMetrics(urlPath,token){
+    return new Promise(function(resolve,reject){
+        try{
+            const params = {
+                'fields':'comments.summary(total_count).limit(1),reactions.summary(total_count).limit(1)',
+                'access_token':token
+            }
+            resolve(GetAll(urlPath,params).then((results)=>{
+                    if(results){
+                        return helpers.formatFbPostMetrics(results);
+                    }
+                    return {};
+                }).catch((err)=>{
+                    throw (err)
+                }))
+        }catch(e){
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     Get: Get,
     Discover: DiscoverPosts,
@@ -330,4 +404,6 @@ module.exports = {
     GetInsights: GetDailyInsights,
     GetAudiences: GetLifetimeInsights,
     DiscoverUserPosts: DiscoverUserPosts,
+    GetFbPosts: GetFbPosts,
+    GetFbPostMetrics: GetFbPostMetrics,
 }
