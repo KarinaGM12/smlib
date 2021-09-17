@@ -261,6 +261,33 @@ function formatFbPostMetrics(response){
     return out;
 }
 
+function formatAudiencesResponse(response){
+    const out = {
+        countries: {},
+        cities:{},
+    }
+    if (typeof response === 'object'){
+        if (response && Array.isArray(response)){
+            response.forEach((metric)=>{
+                if (typeof metric === 'object' && 'name' in metric && 'values' in metric){
+                    const values = metric.values
+                    if (values && Array.isArray(values) && values.length > 0){
+                        const audiences = values[0]
+                        if (typeof audiences === 'object' && 'value' in audiences){
+                            if (metric.name === 'audience_country'){
+                                out.countries = audiences.value
+                            }else if (metric.name === 'audience_city'){
+                                out.cities =  audiences.value
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+    return out
+}
+
 module.exports = {
     buildURL: buildURL,
     formatRequestOptions: formatRequestOptions,
@@ -275,4 +302,5 @@ module.exports = {
     aggregateDailyMetrics: aggregateDailyMetrics,
     getDateRange: getDateRange,
     formatFbPostMetrics: formatFbPostMetrics,
+    formatAudiencesResponse: formatAudiencesResponse
 }
