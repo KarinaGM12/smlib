@@ -33,6 +33,12 @@ aggregated over a time range from n days ago up to current date</p>
 <dt><a href="#DiscoverUserPosts">DiscoverUserPosts(urlPath, userName, daysAgo, token)</a> ⇒ <code>Promise.&lt;Array.&lt;DiscoveryPosts&gt;, Error&gt;</code></dt>
 <dd><p>Returns posts for Instagram user using business dicovery since &#39;daysAgo&#39; till current date</p>
 </dd>
+<dt><a href="#GetFbPosts">GetFbPosts(urlPath, daysAgo, token)</a> ⇒ <code>Promise.&lt;Array.&lt;Post&gt;, Error&gt;</code></dt>
+<dd><p>Returns Facebook user posts</p>
+</dd>
+<dt><a href="#GetFbPostMetrics">GetFbPostMetrics(urlPath, token)</a> ⇒ <code>Promise.&lt;PostMetric, Error&gt;</code></dt>
+<dd><p>Returns Facebook user post metrics</p>
+</dd>
 </dl>
 
 ## Typedefs
@@ -47,6 +53,12 @@ aggregated over a time range from n days ago up to current date</p>
 <dt><a href="#Post">Post</a></dt>
 <dd></dd>
 <dt><a href="#Metrics">Metrics</a></dt>
+<dd></dd>
+<dt><a href="#Audiences">Audiences</a></dt>
+<dd></dd>
+<dt><a href="#FbPost">FbPost</a></dt>
+<dd></dd>
+<dt><a href="#PostMetric">PostMetric</a></dt>
 <dd></dd>
 </dl>
 
@@ -182,11 +194,11 @@ fb.GetInsights('/v11.0/your_ig_user/insights','your_access_token',11).then((data
 
 <a name="GetLifetimeInsights"></a>
 
-## GetAudiences(urlPath, token) ⇒ <code>Promise.&lt;Array, Error&gt;</code>
+## GetAudiences(urlPath, token) ⇒ <code>Promise.&lt;(Audiences\|Error)&gt;</code>
 Returns countries and cities for Instagram user followers
 
 **Kind**: global function  
-**Returns**: <code>Promise.&lt;Array, Error&gt;</code> - Promise object represents request payload  
+**Returns**: <code>Promise.&lt;(Audiences\|Error)&gt;</code> - Promise object represents request payload  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -223,6 +235,51 @@ fb.DiscoverUserPosts('/v11.0/your_ig_user_id','instagram_user_to_discover',18,'y
     //Do something with data
 }).catch((err)=>{
     //Do something with error
+})
+```
+
+<a name="GetFbPosts"></a>
+
+## GetFbPosts(urlPath, daysAgo, token) ⇒ <code>Promise.&lt;Array.&lt;FbPost&gt;, Error&gt;</code>
+Returns Facebook user posts
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;Array.&lt;FbPost&gt;, Error&gt;</code> - Promise to the request response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| urlPath | <code>string</code> | URL path for request. Must start with api version ex: /v11.0/.. |
+| daysAgo | <code>Number</code> | Number of days you want to query. Ex 2 means you want to query posts from 2 days ago till today |
+| token | <code>string</code> | Facebook API access token |
+
+**Example**
+```javascript
+fb.GetFbPosts('/v11.0/your_user_id/posts',3,'your_access_token').then((data)=>{
+   //Do something with data
+}).catch((err)=>{
+   //Do something with error
+})
+```
+
+<a name="GetFbPostMetrics"></a>
+
+## GetFbPostMetrics(urlPath, token) ⇒ <code>Promise.&lt;PostMetric, Error&gt;</code>
+Returns Facebook user post metrics
+
+**Kind**: global function  
+**Returns**: <code>Promise.&lt;PostMetric, Error&gt;</code> - Promise to the request response  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| urlPath | <code>string</code> | URL path for request. Must start with api version ex: /v11.0/.. |
+| token | <code>string</code> | Facebook API access token |
+
+**Example**
+```javascript
+fb.GetFbPostMetrics('/v11.0/your_post_id','your_access_token').then((data)=>{
+   //Do something with data
+}).catch((err)=>{
+   //Do something with error
 })
 ```
 
@@ -293,3 +350,39 @@ fb.DiscoverUserPosts('/v11.0/your_ig_user_id','instagram_user_to_discover',18,'y
 | impressions | <code>number</code> | Number of times posts from the Instagram user have been seen |
 | follower_count | <code>number</code> | Sum of new followers within the specified range |
 
+<a name="Audiences"></a>
+
+## Audiences
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| countries | <code>object</code> | Object whose properties are the country codes from Instagram followers,  with property values as the number of followers fromeach country. |
+| citues | <code>object</code> | Object whose propertiesare the city names, with property values as the number of followers from each city |
+
+<a name="FbPost"></a>
+
+## FbPost
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>string</code> | Post ID |
+| message | <code>string</code> | Post message |
+| type | <code>string</code> | Post type, ex: video, photo |
+| picture_uri | <code>string</code> | Post image uri if it contains a picture |
+| video_uri | <code>string</code> | Post video uri if it contains a video |
+| created_time | <code>string</code> | The time the post was published |
+
+<a name="PostMetric"></a>
+
+## PostMetric
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| comments | <code>number</code> | Number of people who commented post |
+| reactions | <code>number</code> | Number of people who reacted to post |

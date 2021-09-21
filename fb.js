@@ -330,7 +330,7 @@ function DiscoverUserPosts(urlPath,userName,daysAgo,token){
 
 /**
  * 
- * @typedef Post
+ * @typedef FbPost
  * @property {string} id Post ID
  * @property {string} message Post message
  * @property {string} type Post type, ex: video, photo
@@ -344,7 +344,7 @@ function DiscoverUserPosts(urlPath,userName,daysAgo,token){
  * @param {string} urlPath URL path for request. Must start with api version ex: /v11.0/..
  * @param {Number} daysAgo Number of days you want to query. Ex 2 means you want to query posts from 2 days ago till today
  * @param {string} token Facebook API access token
- * @returns {Promise<Post[],Error>} Promise to the request response
+ * @returns {Promise<FbPost[],Error>} Promise to the request response
  */
 function GetFbPosts(urlPath, daysAgo,token){
     return new Promise(function(resolve,reject){
@@ -379,7 +379,7 @@ function GetFbPosts(urlPath, daysAgo,token){
  * Returns Facebook user post metrics
  * @param {string} urlPath URL path for request. Must start with api version ex: /v11.0/..
  * @param {string} token Facebook API access token
- * @returns {Promise<Promise,Error>} Promise to the request response
+ * @returns {Promise<PostMetric,Error>} Promise to the request response
  */
 function GetFbPostMetrics(urlPath,token){
     return new Promise(function(resolve,reject){
