@@ -294,3 +294,43 @@ describe('formatFbPostMetrics',()=>{
         assert.equal(results.reactions,2);
     })
 })
+
+describe('formatAudiencesResponse',()=>{
+    it('returns empty object when response is empty',()=>{
+        const result = helpers.formatAudiencesResponse([]);
+        assert.deepEqual(result,{countries:{},cities:{}});
+    })
+
+    it('returns cities and countries when response is not empyt',()=>{
+        const result = helpers.formatAudiencesResponse([
+        {
+            "name": "audience_country",
+            "values": [
+                {
+                    "value": {
+                        "DE": 1
+                    }
+                }
+            ]
+        },
+        {
+            "name": "audience_city",
+            "values": [
+                {
+                  "value": {
+                    "Tepic, Nayarit": 1
+                  }
+                }
+            ]
+        }
+        ]);
+        assert.deepEqual(result,{
+            countries: {
+                "DE": 1
+            },
+            cities:{
+                "Tepic, Nayarit": 1
+            }
+        })
+    })
+})

@@ -340,7 +340,7 @@ describe('GetAudiences',()=>{
   it('Returns empty array when no data is available', async ()=>{
     let promise = fb.GetAudiences('/v11.0/17269676367939291/insights','testtoken');
     let result = await promise;
-    assert.deepEqual(result,[]);
+    assert.deepEqual(result,{countries:{},cities:{}});
   })
 })
 
